@@ -6,8 +6,8 @@ function createProgram(shader) {
     var program = gl.createProgram();
  
     // attach the shaders.
-    gl.attachShader(program, compileShader(vertexShader, gl.VERTEX_SHADER));
-    gl.attachShader(program, compileShader(fragmentShader, gl.FRAGMENT_SHADER));
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
  
     // link the program.
     gl.linkProgram(program);
@@ -22,11 +22,21 @@ function createProgram(shader) {
     return program;
 }
 
+function getUniformLocations(program, shader) {
+
+    var uni = {};
+    debugger;
+    for (var u in shader.uniforms) {
+        shader.uniforms[u].location = gl.getUniformLocation(program, u); // { name: u, location: gl.getUniformLocation(program, u), value: 0 };
+    }
+
+    return shader.uniforms;
+}
+
 function gl2material(name, shader) {
 
-
-
     this.program = createProgram(shader);
+    this.uniforms = getUniformLocations(this.program, shader);
     this.name = name || "";
     return this;
 }

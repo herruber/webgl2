@@ -7,48 +7,17 @@ Array.prototype.each = function (fn) {
 }
 
 
-function vec(a, b, c, d) {
 
-    this.vec3 = function () {
-        this.value = new Float32Array([0, 0, 0])
-        return this;
-    }
+Array.prototype.first = function () {
+    return this[0];
+}
 
-    this.vec2 = function () {
-        this.value = new Float32Array([0, 0])
-        return this;
-    }
+Array.prototype.last = function () {
+    return this[this.length - 1];
+}
 
-    this.vec4 = function () {
-        this.value = new Float32Array([0, 0, 0, 0])
-        return this;
-    }
+Number.prototype.frac = function () {
 
-    var buffer = [];
+    return Math.abs(this - Math.floor(this));
 
-    if (a) {
-
-        if (a.length) {
-
-            a.each(function (nr) {
-                buffer.push(nr);
-            })
-        }
-        else {
-            buffer.push(a);
-        }
-
-    }
-    else {
-        buffer.push(0, 0, 0, 0);
-    }
-
-    this.value = new Float32Array(buffer);
-    this.x = this.value[0];
-    this.y = this.value[1];
-    this.z = this.value[2] || null;
-    this.w = this.value[3] || null;
-
-
-    return this;
 }

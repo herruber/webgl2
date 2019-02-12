@@ -40,66 +40,10 @@ function gl2geometry(vertices, material, uvs, normals) {
 function gl2mesh(name, geometries) {
 
     this.visible = true;
-    this.cube = function () {
+  
+    if (geometries && !geometries.length) {
 
-        var arr = [
-       // Front face
-       -1.0, -1.0, 1.0,
-        1.0, -1.0, 1.0,
-        1.0, 1.0, 1.0,
-       -1.0, 1.0, 1.0,
-
-       // Back face
-       -1.0, -1.0, -1.0,
-       -1.0, 1.0, -1.0,
-        1.0, 1.0, -1.0,
-        1.0, -1.0, -1.0,
-
-       // Top face
-       -1.0, 1.0, -1.0,
-       -1.0, 1.0, 1.0,
-        1.0, 1.0, 1.0,
-        1.0, 1.0, -1.0,
-
-       // Bottom face
-       -1.0, -1.0, -1.0,
-        1.0, -1.0, -1.0,
-        1.0, -1.0, 1.0,
-       -1.0, -1.0, 1.0,
-
-       // Right face
-        1.0, -1.0, -1.0,
-        1.0, 1.0, -1.0,
-        1.0, 1.0, 1.0,
-        1.0, -1.0, 1.0,
-
-       // Left face
-       -1.0, -1.0, -1.0,
-       -1.0, -1.0, 1.0,
-       -1.0, 1.0, 1.0,
-       -1.0, 1.0, -1.0,
-        ]
-
-        this.geometries = [new gl2geometry(arr, new gl2material("basic", shaders.basic))]
-        this.name = "cube";
-        return this;
-    }
-
-    this.plane = function () {
-        var arr = [
-   // Front face
-   -1.0, -1.0, 0.0,
-    1.0, -1.0, 0.0,
-    1.0, 1.0, 0.0,
-
-    1.0, 1.0, 0.0,
-    -1.0, 1.0, 0.0,
-   -1.0, -1.0, 0.0
-        ]
-
-        this.geometries = [new gl2geometry(arr, new gl2material("basic", shaders.basic))]
-        this.name = "cube";
-        return this;
+        geometries = [geometries];
     }
 
     Object.create(gl2object);
@@ -109,3 +53,24 @@ function gl2mesh(name, geometries) {
     return this;
 }
 
+function gl2plane(size, material) {
+
+    var x = size[0] / 2;
+    var y = size[1] / 2;
+    var z = size[2] / 2;
+
+      var arr = [
+        // Front face
+        -x, -y, 0.0,
+        x, -y, 0.0,
+        x, y, 0.0,
+
+        x, y, 0.0,
+        -x, y, 0.0,
+        -x, -y, 0.0
+        ]
+
+      var geometry = new gl2geometry(arr, material || new gl2material("basic", shaders.basic))
+
+    return geometry;
+}
