@@ -106,13 +106,27 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="css\style.css" />
+    <Content Include="main.html" />
     <Content Include="scripts\ai.0.22.9-build00167.js" />
     <Content Include="scripts\ai.0.22.9-build00167.min.js" />
+    <Content Include="scripts\extensions.js" />
+    <Content Include="scripts\objects\gl2material.js" />
+    <Content Include="scripts\objects\gl2object.js" />
+    <Content Include="scripts\objects\scene.js" />
+    <Content Include="scripts\objects\transform.js" />
+    <Content Include="scripts\rendering\gl2renderer.js" />
+    <Content Include="scripts\shaders\shaders.js" />
+    <Content Include="scripts\startup.js" />
+    <Content Include="scripts\utils\gl-matrix.js" />
+    <Content Include="scripts\utils\gl-utils.js" />
+    <None Include="scripts\_references.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
