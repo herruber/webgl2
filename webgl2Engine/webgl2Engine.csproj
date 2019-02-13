@@ -117,6 +117,7 @@
     <Content Include="scripts\objects\transform.js" />
     <Content Include="scripts\rendering\gl2renderer.js" />
     <Content Include="scripts\shaders\shaders.js" />
+    <Content Include="scripts\sizeof.compressed.js" />
     <Content Include="scripts\startup.js" />
     <Content Include="scripts\utils\gl-matrix.js" />
     <Content Include="scripts\utils\gl-utils.js" />

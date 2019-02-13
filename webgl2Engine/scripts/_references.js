@@ -7,6 +7,7 @@
 /// <reference path="objects/transform.js" />
 /// <reference path="rendering/gl2renderer.js" />
 /// <reference path="shaders/shaders.js" />
+/// <reference path="sizeof.compressed.js" />
 /// <reference path="startup.js" />
 /// <reference path="utils/gl-matrix.js" />
 /// <reference path="utils/gl-utils.js" />

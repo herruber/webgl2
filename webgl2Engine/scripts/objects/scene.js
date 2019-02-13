@@ -8,7 +8,7 @@
         self.active = [];
 
         this.children.each(function (obj) {
-            debugger;
+            
             if (obj.visible) self.active.push(obj);
         });
 

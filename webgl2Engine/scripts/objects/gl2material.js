@@ -25,7 +25,7 @@ function createProgram(shader) {
 function getUniformLocations(program, shader) {
 
     var uni = {};
-    debugger;
+    
     for (var u in shader.uniforms) {
         shader.uniforms[u].location = gl.getUniformLocation(program, u); // { name: u, location: gl.getUniformLocation(program, u), value: 0 };
     }

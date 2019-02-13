@@ -1,4 +1,26 @@
-﻿function gl2object(name, transform) {
+﻿
+function gl2camera(fovy, aspect, near, far) {
+    this.name = "";
+    this.fov = fovy || 65;
+    this.aspect = aspect || 0.5;
+    this.near = near || 0.1;
+    this.far = far || 100;
+
+
+    this.transform = new transform();
+    this.viewMatrix = new m4_identity();
+    this.projectionMatrix = new m4_identity();
+
+    this.setMatrices = function () {
+
+        this.projectionMatrix = new m4_perspective(this.fov, this.aspect, this.near, this.far);
+        this.viewMatrix = new m4_view(this.transform);
+    }
+
+    return this;
+}
+
+function gl2object(name, transform) {
 
     this.type = "gl2object";
     this.name = name || "";
@@ -28,7 +50,7 @@ function createBuffer(array) {
 function gl2geometry(vertices, material, uvs, normals) {
 
     this.vertices = createBuffer(vertices);
-
+    this.uvs = createBuffer(uvs);
     this.material = material;
     this.visible = true;
 
@@ -47,6 +69,7 @@ function gl2mesh(name, geometries) {
     }
 
     Object.create(gl2object);
+
     this.geometries = geometries || [];
     this.name = name || "";
 
@@ -68,9 +91,20 @@ function gl2plane(size, material) {
         x, y, 0.0,
         -x, y, 0.0,
         -x, -y, 0.0
-        ]
+      ]
 
-      var geometry = new gl2geometry(arr, material || new gl2material("basic", shaders.basic))
+      var uvs = [
+          0, 0,
+          1, 0,
+          1, 1,
 
+          1, 1,
+          0, 1,
+          0, 0
+
+      ]
+
+      var geometry = new gl2geometry(arr, material || new gl2material("basic", shaders.basic), uvs)
+     
     return geometry;
 }

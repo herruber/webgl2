@@ -1,22 +1,28 @@
 ﻿
-
-
-
 var shaders = {
 
     basic: {
-        vertex:`#version 300 es
+        vertex: `#version 300 es
 
         // an attribute is an input (in) to a vertex shader.
         // It will receive data from a buffer
         in vec4 position;
+        in vec2 uv;
 
+        uniform mat4 modelMatrix;
+        uniform mat4 viewMatrix;
+        uniform mat4 projectionMatrix;
+
+        out vec2 vUv;
         // all shaders have a main function
         void main() {
-
+           vUv = uv;
           // gl_Position is a special variable a vertex shader
           // is responsible for setting
-          gl_Position = position;
+          //vec4 pos =  modelMatrix  * viewMatrix * projectionMatrix* position;
+           vec4 pos =  projectionMatrix * viewMatrix * modelMatrix * position;
+          //vec4 pos =  projectionMatrix * modelMatrix * position;
+          gl_Position = pos;
         }`
         ,
         fragment: `#version 300 es
@@ -25,21 +31,23 @@ var shaders = {
         // to pick one. mediump is a good default. It means "medium precision"
         precision mediump float;
 
+        in vec2 vUv;
+       
         // we need to declare an output for the fragment shader
-        layout (location = 0) out vec4 outColor0; // 出力先の指定
-        layout (location = 1) out vec4 outColor1; // 出力先の指定
-        layout (location = 2) out vec4 outColor2; // 出力先の指定
-        layout (location = 3) out vec4 outColor3; // 出力先の指定
+        layout (location = 0) out vec4 outColor0;
+        layout (location = 1) out vec4 outColor1;
+        layout (location = 2) out vec4 outColor2;
+        layout (location = 3) out vec4 outColor3;
 
         void main() {
           // Just set the output to a constant redish-purple
           outColor0 = vec4(1, 0, 0, 1);
           outColor1 = vec4(1, 1, 0, 1);
-          outColor2 = vec4(1, 0, 1, 1);
-          outColor3 = vec4(0, 0, 1, 1);
+          outColor2 = vec4(0, 1, 1, 1);
+          outColor3 = vec4(1, 0, 1, 1);
         }`,
         uniforms: {
-            
+
         }
     },
     gBuffer: {
@@ -48,10 +56,11 @@ var shaders = {
         // an attribute is an input (in) to a vertex shader.
         // It will receive data from a buffer
         in vec4 position;
-
+        in vec2 uv;
+        out vec2 vUv;
         // all shaders have a main function
         void main() {
-
+           vUv = uv;
           // gl_Position is a special variable a vertex shader
           // is responsible for setting
           gl_Position = position;
@@ -62,6 +71,8 @@ var shaders = {
         // fragment shaders don't have a default precision so we need
         // to pick one. mediump is a good default. It means "medium precision"
         precision mediump float;
+
+        in vec2 vUv;
 
         uniform sampler2D tex1;
         uniform sampler2D tex2;
@@ -77,12 +88,19 @@ var shaders = {
         }
 
         void main() {
-            vec4 cola = sampleCenter(tex1);
-             vec4 colb = sampleCenter(tex2);
-              vec4 colc = sampleCenter(tex3);
-               vec4 cold = sampleCenter(tex4);
+          vec4 cola = sampleCenter(tex1);
+          vec4 colb = sampleCenter(tex2);
+          vec4 colc = sampleCenter(tex3);
+          vec4 cold = sampleCenter(tex4);
 
-          outColor = cola + colb + colc + cold; // vec4(0, 0, 1, 1);
+          vec4 color;
+
+          vec4 lerpx = mix(texture(tex1, vUv), texture(tex2, vUv), vUv.x);
+          vec4 lerpy = mix(texture(tex3, vUv), texture(tex4, vUv), vUv.y);
+
+
+
+          outColor = (lerpx + lerpy) / 2.0;
         }`,
         uniforms: {
             tex1: { name: "tex1", location: -1, value: null },
