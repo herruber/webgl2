@@ -133,49 +133,54 @@ function gl2renderer(element) {
 
     }
 
-    this.setMatrices = function (program, object) {
-        debugger;
+    this.uploadMatrices = function (program, object) {
         gl.uniformMatrix4fv(gl.getUniformLocation(program, "modelMatrix"), false, object.transform.modelMatrix)
-        gl.uniformMatrix4fv(gl.getUniformLocation(program, "projectionMatrix"), false, camera.projectionMatrix)
-        gl.uniformMatrix4fv(gl.getUniformLocation(program, "viewMatrix"), false, camera.viewMatrix)
+        gl.uniformMatrix4fv(gl.getUniformLocation(program, "projectionMatrix"), false, camera.transform.projectionMatrix)
+        gl.uniformMatrix4fv(gl.getUniformLocation(program, "viewMatrix"), false, camera.transform.viewMatrix)
     
     }
+
+    this.updateDirections
+
+    this.updateMatrices = function (object) {
+
+        var transform = object.transform;
+        transform.modelMatrix = new m4_transform(transform);
+        transform.viewMatrix = new m4_inverse(transform.modelMatrix);
+        setTransformDirections(transform);
+
+        switch (object.type) {
+            case "gl2object":
+                break;
+            case "gl2camera":                
+                transform.projectionMatrix = new m4_perspective(object.fov, object.aspect, object.near, object.far);
+                break;
+            default:
+
+        }
+    }
+
 
     this.renderObject = function (object) {
 
         var mesh = object.meshes.first();
 
-        //object.transform.needsUpdate = true;
-
-        //if (object.transform.needsUpdate) {
-        //    object.transform.modelMatrix = m4_transform(object.transform);
-        //    object.transform.needsUpdate = false;
-        //}
-
-        //camera.transform.position[0] = Math.sin(performance.now()) * 0.2;
-        camera.transform.needsUpdate = true;
-        camera.transform.position[2] = -5;
-        camera.transform.position[0] = -1;
-
-        if (camera.transform.needsUpdate) {
-            camera.viewMatrix = m4_view(camera.transform);
-            camera.transform.needsUpdate = false;
-        }
-
+        self.updateMatrices(object);
+     
+      
         for (var i = 0; i < mesh.geometries.length; i++) {
 
             var geometry = mesh.geometries[i];
             var program = geometry.material.program;
-            var uniforms = geometry.material.uniforms;
-
-
-            // Tell it to use our program (pair of shaders)
             gl.useProgram(program);
+            var uniforms = geometry.material.uniforms;
+          
+            // Tell it to use our program (pair of shaders)
+
+            self.uploadMatrices(program, object)
 
             //Set all the uniform values
 
-            self.setMatrices(program, object);
-             console.log(camera.viewMatrix)
             for (var prop in uniforms) {
                 gl.uniform1i(uniforms[prop].location, uniforms[prop].value);
             }
@@ -184,7 +189,7 @@ function gl2renderer(element) {
 
             // Draw the geometry.
             var primitiveType = gl.TRIANGLES;
-            gl.drawArrays(primitiveType, 0, 6);
+            gl.drawArrays(primitiveType, 0, geometry.vertexCount);
         }
 
     }
@@ -212,16 +217,9 @@ function gl2renderer(element) {
 
     }
 
-    this.updateCamera = function () {
-
-        camera.setMatrices();
-
-    }
-
     this.render = function () {
 
         scene.setActive();
-        self.updateCamera();
 
         self.adjustDrawingBufferSize();
         gl.viewport(0, 0, element.width, element.height);
@@ -232,7 +230,11 @@ function gl2renderer(element) {
         gl.depthMask(true);
         gl.disable(gl.BLEND);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        
+
+       // camera.transform.position[2] = Math.sin(performance.now() / 220);
+       // camera.transform.rotation[0] = Math.sin(performance.now() / 600) * 45;
+        self.updateMatrices(camera)
+
         for (var i = 0; i < scene.active.length; i++) {
             self.renderObject(scene.active[i])
         }

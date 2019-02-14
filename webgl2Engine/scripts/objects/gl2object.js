@@ -1,33 +1,10 @@
 ﻿
-function gl2camera(fovy, aspect, near, far) {
-    this.name = "";
-    this.fov = fovy || 65;
-    this.aspect = aspect || 0.5;
-    this.near = near || 0.1;
-    this.far = far || 100;
+function clone(obj) {
+    if (!obj) return;
+    var string = JSON.stringify(obj);
 
+    return JSON.parse(string);
 
-    this.transform = new transform();
-    this.viewMatrix = new m4_identity();
-    this.projectionMatrix = new m4_identity();
-
-    this.setMatrices = function () {
-
-        this.projectionMatrix = new m4_perspective(this.fov, this.aspect, this.near, this.far);
-        this.viewMatrix = new m4_view(this.transform);
-    }
-
-    return this;
-}
-
-function gl2object(name, transform) {
-
-    this.type = "gl2object";
-    this.name = name || "";
-    this.meshes = [];
-    this.transform = transform || new transform();
-    this.visible = true;
-    return this;
 }
 
 function createBuffer(array) {
@@ -47,12 +24,44 @@ function createBuffer(array) {
 
 }
 
+function gl2camera(fovy, aspect, near, far) {
+    this.name = "";
+    this.type = "gl2camera";
+    this.fov = fovy || 65;
+    this.aspect = aspect || 0.5;
+    this.near = near || 0.1;
+    this.far = far || 100;
+
+
+    this.transform = new transform();
+
+    return this;
+}
+
+function gl2object(name, transform) {
+
+    this.type = "gl2object";
+    this.name = name || "";
+    this.meshes = [];
+    this.transform = transform || new transform();
+    this.visible = true;
+    return this;
+}
+
 function gl2geometry(vertices, material, uvs, normals) {
 
-    this.vertices = createBuffer(vertices);
-    this.uvs = createBuffer(uvs);
-    this.material = material;
+    this.vertices = vertices ? createBuffer(vertices) : null;
+    this.vertexCount = vertices ? vertices.length / 3 : 0;
+    this.uvs = uvs ? createBuffer(uvs) : null;
+    this.material = material || new gl2material("basic", shaders.basic);
     this.visible = true;
+
+    this.set = function (vertices, uvs, normals) {
+        debugger;
+        this.vertices = createBuffer(vertices) || this.vertices;
+        this.vertexCount = vertices ? vertices.length / 3 : 0;
+        this.uvs = createBuffer(uvs) || this.uvs;
+    }
 
     return this;
 
@@ -107,4 +116,19 @@ function gl2plane(size, material) {
       var geometry = new gl2geometry(arr, material || new gl2material("basic", shaders.basic), uvs)
      
     return geometry;
+}
+
+function gl2box(name, size, transform) {
+
+    var box = clone(objectCache.objects.untitled);
+
+    var verts = box.meshes.first().geometries.first().vertices;
+
+    for (var i = 0; i < verts.length; i++) {
+
+        debugger;
+
+    }
+
+
 }

@@ -1,10 +1,92 @@
 ﻿
+function xmlToJson(xml) {
+    'use strict';
+    // Create the return object
+    var obj = {}, i, j, attribute, item, nodeName, old;
+
+    if (xml.nodeType === 1) { // element
+        // do attributes
+        if (xml.attributes.length > 0) {
+            obj["@attributes"] = {};
+            for (j = 0; j < xml.attributes.length; j = j + 1) {
+                attribute = xml.attributes.item(j);
+                obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+            }
+        }
+    } else if (xml.nodeType === 3) { // text
+        obj = xml.nodeValue;
+    }
+
+    // do children
+    if (xml.hasChildNodes()) {
+        for (i = 0; i < xml.childNodes.length; i = i + 1) {
+            item = xml.childNodes.item(i);
+            nodeName = item.nodeName;
+            if ((obj[nodeName]) === undefined) {
+                obj[nodeName] = xmlToJson(item);
+            } else {
+                if ((obj[nodeName].push) === undefined) {
+                    old = obj[nodeName];
+                    obj[nodeName] = [];
+                    obj[nodeName].push(old);
+                }
+                obj[nodeName].push(xmlToJson(item));
+            }
+        }
+    }
+    return obj;
+};
+
 Array.prototype.each = function (fn) {
 
     for (var i = 0; i < this.length; i++) {
         fn(this[i], i);
     }
 }
+
+
+Float32Array.prototype.x = function () {
+    return this[0];
+    debugger;
+}
+
+Float32Array.prototype.y = function () {
+    return this[1];
+}
+
+Float32Array.prototype.z = function () {
+    return this[2];
+}
+
+Float32Array.prototype.w = function () {
+    return this[3];
+}
+
+Float32Array.prototype.r = function () {
+    return this[0];
+}
+
+Float32Array.prototype.g = function () {
+    return this[1];
+}
+
+Float32Array.prototype.b = function () {
+    return this[2];
+}
+
+Float32Array.prototype.a = function () {
+    return this[3];
+}
+
+Float32Array.prototype.first = function () {
+    return this[0];
+}
+
+Float32Array.prototype.last = function () {
+    return this[this.length - 1];
+}
+
+////////
 
 Array.prototype.x = function () {
     return this[0];
@@ -72,17 +154,28 @@ function mul(a, b) {
 
     var result = [];
 
-    for (var i = 0; i < a.length; i++) {
+    if (!b.length) {
+        for (var i = 0; i < a.length; i++) {
 
-        if(isNaN(b[i])){
-            result.push(a[i]);
-        }
-        else {
-            result.push(a[i] * b[i]);
+                result.push(a[i] * b);
+
         }
 
     }
-    
+    else {
+        for (var i = 0; i < a.length; i++) {
+
+            if (isNaN(b[i])) {
+                result.push(a[i]);
+            }
+            else {
+                result.push(a[i] * b[i]);
+            }
+
+        }
+
+    }
+ 
     return result;
 
 }
@@ -95,22 +188,32 @@ function div(a, b) {
 
     var result = [];
 
-    for (var i = 0; i < a.length; i++) {
+    if (!b.length) {
+        for (var i = 0; i < a.length; i++) {
 
-        if (b[i] === 0) {
-            console.error("Division by zero");
-            return;
-        }
+            result.push(a[i] / b);
 
-        if (isNaN(b[i])) {
-            result.push(a[i]);
-        }
-        else {
-            result.push(a[i] / b[i]);
         }
 
     }
+    else {
 
+        for (var i = 0; i < a.length; i++) {
+
+            if (b[i] === 0) {
+                console.error("Division by zero");
+                return;
+            }
+
+            if (isNaN(b[i])) {
+                result.push(a[i]);
+            }
+            else {
+                result.push(a[i] / b[i]);
+            }
+
+        }
+    }
     return result;
 
 }
@@ -118,16 +221,25 @@ function div(a, b) {
 function add(a, b) {
 
     var result = [];
+    if (!b.length) {
+        for (var i = 0; i < a.length; i++) {
 
-    for (var i = 0; i < a.length; i++) {
+            result.push(a[i] + b);
 
-        if (isNaN(b[i])) {
-            result.push(a[i]);
-        }
-        else {
-            result.push(a[i] + b[i]);
         }
 
+    }
+    else {
+        for (var i = 0; i < a.length; i++) {
+
+            if (isNaN(b[i])) {
+                result.push(a[i]);
+            }
+            else {
+                result.push(a[i] + b[i]);
+            }
+
+        }
     }
 
     return result;
@@ -137,18 +249,26 @@ function add(a, b) {
 function sub(a, b) {
 
     var result = [];
+    if (!b.length) {
+        for (var i = 0; i < a.length; i++) {
 
-    for (var i = 0; i < a.length; i++) {
+            result.push(a[i] - b);
 
-        if (isNaN(b[i])) {
-            result.push(a[i]);
-        }
-        else {
-            result.push(a[i] - b[i]);
         }
 
     }
+    else {
+        for (var i = 0; i < a.length; i++) {
 
+            if (isNaN(b[i])) {
+                result.push(a[i]);
+            }
+            else {
+                result.push(a[i] - b[i]);
+            }
+
+        }
+    }
     return result;
 
 }
@@ -411,28 +531,163 @@ function m4_fromQuat(q){
 
 function m4_transform(transform) {
 
-    var pos = transform.position;
-    var scale = transform.scale;
-    var rotation = q_fromEuler(transform.rotation);
+    // Quaternion math
 
-    var m4position =  [1, 0, 0, pos[0],
-            0, 1, 0, pos[1],
-            0, 0, 1, pos[2],
-            0, 0, 0, 1];
+    var q = q_fromEuler(transform.rotation);
+    var v = transform.position;
+    var s = transform.scale;
+    var out = new m4_identity();
 
-    var m4scale = [scale.x || 1, 0, 0, 0,
-                   0, scale.y || 1, 0, 0,
-                   0, 0, scale.z || 1, 0,
-                   0, 0, 0, 1             
-    ];
 
-    var m4rot = m4_fromQuat(rotation);
+    var x = q[0], y = q[1], z = q[2], w = q[3];
 
-    var result = m4position;
-    result = m4_mul(result, m4rot);
-    result = m4_mul(result, m4scale);
+    var x2 = x + x;
 
-    return new Float32Array(result);
+    var y2 = y + y;
+
+    var z2 = z + z;
+
+    var xx = x * x2;
+
+    var xy = x * y2;
+
+    var xz = x * z2;
+
+    var yy = y * y2;
+
+    var yz = y * z2;
+
+    var zz = z * z2;
+
+    var wx = w * x2;
+
+    var wy = w * y2;
+
+    var wz = w * z2;
+
+    var sx = s[0];
+
+    var sy = s[1];
+
+    var sz = s[2];
+
+    out[0] = (1 - (yy + zz)) * sx;
+
+    out[1] = (xy + wz) * sx;
+
+    out[2] = (xz - wy) * sx;
+
+    out[3] = 0;
+
+    out[4] = (xy - wz) * sy;
+
+    out[5] = (1 - (xx + zz)) * sy;
+
+    out[6] = (yz + wx) * sy;
+
+    out[7] = 0;
+
+    out[8] = (xz + wy) * sz;
+
+    out[9] = (yz - wx) * sz;
+
+    out[10] = (1 - (xx + yy)) * sz;
+
+    out[11] = 0;
+
+    out[12] = v[0];
+
+    out[13] = v[1];
+
+    out[14] = v[2];
+
+    out[15] = 1;
+
+    return out;
+
+}
+
+function m4_inverse(a) {
+
+    var out = new m4_identity();
+    var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
+
+    var a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
+
+    var a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
+
+    var a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+
+    var b00 = a00 * a11 - a01 * a10;
+
+    var b01 = a00 * a12 - a02 * a10;
+
+    var b02 = a00 * a13 - a03 * a10;
+
+    var b03 = a01 * a12 - a02 * a11;
+
+    var b04 = a01 * a13 - a03 * a11;
+
+    var b05 = a02 * a13 - a03 * a12;
+
+    var b06 = a20 * a31 - a21 * a30;
+
+    var b07 = a20 * a32 - a22 * a30;
+
+    var b08 = a20 * a33 - a23 * a30;
+
+    var b09 = a21 * a32 - a22 * a31;
+
+    var b10 = a21 * a33 - a23 * a31;
+
+    var b11 = a22 * a33 - a23 * a32;
+
+    // Calculate the determinant
+
+    var det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+
+    if (!det) {
+
+        return null;
+
+    }
+
+    det = 1.0 / det;
+
+    out[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
+
+    out[1] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
+
+    out[2] = (a31 * b05 - a32 * b04 + a33 * b03) * det;
+
+    out[3] = (a22 * b04 - a21 * b05 - a23 * b03) * det;
+
+    out[4] = (a12 * b08 - a10 * b11 - a13 * b07) * det;
+
+    out[5] = (a00 * b11 - a02 * b08 + a03 * b07) * det;
+
+    out[6] = (a32 * b02 - a30 * b05 - a33 * b01) * det;
+
+    out[7] = (a20 * b05 - a22 * b02 + a23 * b01) * det;
+
+    out[8] = (a10 * b10 - a11 * b08 + a13 * b06) * det;
+
+    out[9] = (a01 * b08 - a00 * b10 - a03 * b06) * det;
+
+    out[10] = (a30 * b04 - a31 * b02 + a33 * b00) * det;
+
+    out[11] = (a21 * b02 - a20 * b04 - a23 * b00) * det;
+
+    out[12] = (a11 * b07 - a10 * b09 - a12 * b06) * det;
+
+    out[13] = (a00 * b09 - a01 * b07 + a02 * b06) * det;
+
+    out[14] = (a31 * b01 - a30 * b03 - a32 * b00) * det;
+
+    out[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
+
+    return out;
+
 }
 
 function m4_view(transform) {
@@ -463,7 +718,9 @@ function m4_perspective(fovy, aspect, near, far) {
 
     fovy = (fovy / 180) * Math.PI;
 
-    var f = 1.0 / Math.tan(fovy / 2), nf;
+    var f = 1.0 / Math.tan(fovy / 2);
+    var nf = f;
+
 
     out[0] = f / aspect;
 
@@ -518,5 +775,204 @@ function m3_identity() {
     return [1, 0, 0,
             0, 1, 0,
             0, 0, 1];
+
+}
+
+function rotateX(point, origin, degrees) {
+
+    var a = point;
+    var b = origin;
+    var c = Math.PI * degrees / 180
+
+    var out = [0, 0, 0];
+    var p = [], r = [];
+
+    //Translate point to the origin
+
+    p[0] = a[0] - b[0];
+
+    p[1] = a[1] - b[1];
+
+    p[2] = a[2] - b[2];
+
+    //perform rotation
+
+    r[0] = p[0];
+
+    r[1] = p[1] * Math.cos(c) - p[2] * Math.sin(c);
+
+    r[2] = p[1] * Math.sin(c) + p[2] * Math.cos(c);
+
+    //translate to correct position
+
+    out[0] = r[0] + b[0];
+
+    out[1] = r[1] + b[1];
+
+    out[2] = r[2] + b[2];
+
+    return out;
+
+}
+
+function rotateY(point, origin, degrees) {
+    var a = point;
+    var b = origin;
+    var c = Math.PI * degrees / 180
+
+    var out = [0, 0, 0];
+    var p = [], r = [];
+
+    //Translate point to the origin
+
+    p[0] = a[0] - b[0];
+
+    p[1] = a[1] - b[1];
+
+    p[2] = a[2] - b[2];
+
+    //perform rotation
+
+    r[0] = p[2] * Math.sin(c) + p[0] * Math.cos(c);
+
+    r[1] = p[1];
+
+    r[2] = p[2] * Math.cos(c) - p[0] * Math.sin(c);
+
+    //translate to correct position
+
+    out[0] = r[0] + b[0];
+
+    out[1] = r[1] + b[1];
+
+    out[2] = r[2] + b[2];
+
+    return out;
+
+}
+
+function rotateZ(point, origin, degrees) {
+
+    var a = point;
+    var b = origin;
+    var c = Math.PI * degrees / 180
+
+    var out = [0, 0, 0];
+    var p = [], r = [];
+
+    //Translate point to the origin
+
+    p[0] = a[0] - b[0];
+
+    p[1] = a[1] - b[1];
+
+    p[2] = a[2] - b[2];
+
+    //perform rotation
+
+    r[0] = p[0] * Math.cos(c) - p[1] * Math.sin(c);
+
+    r[1] = p[0] * Math.sin(c) + p[1] * Math.cos(c);
+
+    r[2] = p[2];
+
+    //translate to correct position
+
+    out[0] = r[0] + b[0];
+
+    out[1] = r[1] + b[1];
+
+    out[2] = r[2] + b[2];
+
+    return out;
+
+}
+
+function rotate(point, origin, degrees) {
+
+    var out = [0, 0, 0];
+
+    out = rotateX(point, origin, degrees[0]);
+    out = rotateX(out, origin, degrees[1]);
+    out = rotateX(out, origin, degrees[2]);
+
+    return out;
+
+}
+
+function degToRad(deg) {
+    return Math.PI * deg / 180;
+}
+
+function directionsFromViewMatrix(a) {
+
+    var out = {
+        forward: normalize([a[2], a[6], a[10]]),
+        right: normalize([a[0], a[4], a[8]]),
+        up: normalize([a[1], a[5], a[9]])
+    }
+
+    out.right.invert();
+
+    return out;
+    
+
+}
+
+Array.prototype.invert = function () {
+
+    for (var i = 0; i < this.length; i++) {
+        this[i] *= -1;
+    }
+}
+
+function setTransformDirections(transform) {
+
+    var result = directionsFromViewMatrix(transform.viewMatrix);
+
+    transform.forward = mul(result.forward, -1);
+    transform.right =  result.right;
+    transform.up = result.up;
+
+}
+
+function cross(a, b) {
+    var out = [0, 0, 0];
+    var ax = a[0], ay = a[1], az = a[2];
+
+    var bx = b[0], by = b[1], bz = b[2];
+
+    out[0] = ay * bz - az * by;
+
+    out[1] = az * bx - ax * bz;
+
+    out[2] = ax * by - ay * bx;
+
+    return out;
+
+}
+
+function _get(url, fn) {
+
+    var xhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+           
+            if (fn) fn(this.responseXML);
+
+        }
+    };
+
+   
+    xhttp.open("GET", url, true);
+    xhttp.send();
+
+}
+
+String.prototype.getFileName = function () {
+
+    return this.split("/").last().split(".").first();
+
 
 }

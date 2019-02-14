@@ -20,8 +20,8 @@ var shaders = {
           // gl_Position is a special variable a vertex shader
           // is responsible for setting
           //vec4 pos =  modelMatrix  * viewMatrix * projectionMatrix* position;
-           vec4 pos =  projectionMatrix * viewMatrix * modelMatrix * position;
-          //vec4 pos =  projectionMatrix * modelMatrix * position;
+          vec4 pos =  projectionMatrix * viewMatrix * modelMatrix * position;
+          //vec4 pos =  modelMatrix * viewMatrix * projectionMatrix * position;
           gl_Position = pos;
         }`
         ,

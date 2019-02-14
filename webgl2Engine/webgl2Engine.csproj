@@ -110,7 +110,11 @@
     <Content Include="main.html" />
     <Content Include="scripts\ai.0.22.9-build00167.js" />
     <Content Include="scripts\ai.0.22.9-build00167.min.js" />
+    <Content Include="scripts\controls\gl2controls.js" />
+    <Content Include="scripts\controls\simple.js" />
     <Content Include="scripts\extensions.js" />
+    <Content Include="scripts\loaders\appLoader.js" />
+    <Content Include="scripts\loaders\daeLoader.js" />
     <Content Include="scripts\objects\gl2material.js" />
     <Content Include="scripts\objects\gl2object.js" />
     <Content Include="scripts\objects\scene.js" />
@@ -127,7 +131,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="files\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

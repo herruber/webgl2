@@ -10,7 +10,10 @@
 
     this.needsUpdate = false;
     this.modelMatrix = new m4_identity();
+    this.viewMatrix = new m4_identity();
+    this.projectionMatrix = new m4_identity();
 
-
+    //new m4_perspective(this.fov, this.aspect, this.near, this.far);
+    //new m4_view(this.transform.modelMatrix);
     return this;
 }
